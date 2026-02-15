@@ -2,7 +2,9 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
+
+import MetodosAuxiliares.Entrada;
+import MetodosAuxiliares.Salida;
 
 public class Main {
     static Random random = new Random();
@@ -10,6 +12,8 @@ public class Main {
     static List<Accidente> accidentes = new ArrayList<>();
 
     public static void main(String[] args) {
+        Entrada entrada = new Entrada();
+        Salida salida = new Salida();
         for (int i = 0; i < 25; i++) {
             Persona persona = generarPersonaAleatoria(random, i);
             personas.add(persona);
@@ -20,90 +24,180 @@ public class Main {
             }
         }
 
-        System.out.println("Bienvenido al sistema de la oficina de seguros, a continuacion seleccione una opcion: ");
-        System.out.print(
-            "1) Ver registros de accidentes\n2) Ver el porcentaje de conductores menores de 25 años\n3) Ver el porcentaje de conductores del sexo femenino\n4) Ver el porcentaje de conductores masculinos con edades entre 12 y 30 años\n5) Ver el porcentaje de conductores cuyos carros estan registrados fuera de Medellin\n6) Registrar nuevo accidente\n7) Salir\nOpcion: ");
-        Scanner sc = new Scanner(System.in);
-        Boolean condition = true;
-        int opcion = 0;
-        while (condition) {
-            try {
-                opcion = sc.nextInt();
-                condition = false;
-            } catch (Exception e) {
-                System.out.println("Ingrese una opcion valida");
-            }
-        }
-        condition = true;
-        while (condition) {
+        String[] opciones = {
+            "Ver registros de accidentes",
+            "Ver el porcentaje de conductores menores de 25 años",
+            "Ver el porcentaje de conductores del sexo femenino",
+            "Ver el porcentaje de conductores masculinos con edades entre 12 y 30 años",
+            "Ver el porcentaje de conductores cuyos carros estan registrados fuera de Medellin",
+            "Registrar nuevo accidente",
+            "Salir"
+        };
+        salida.mostrarMensaje(
+            "Bienvenido al sistema de la oficina de seguros, a continuacion seleccione una opcion:",
+            "Menu"
+        );
+        boolean continuar = true;
+        while (continuar) {
+            int opcion = entrada.mostrarMenu(opciones, "Seleccione una opcion", "Menu");
             switch (opcion) {
+                case -1:
+                    salida.mostrarMensaje("Operacion terminada", "Menu");
+                    continuar = false;
+                    break;
+                case 0:
+                    salida.mostrarMensaje("Operacion cancelada", "Menu");
+                    break;
                 case 1:
+                    StringBuilder registros = new StringBuilder();
                     for (Persona persona : personas) {
-                        System.out.println("Persona: " + persona.getNombre() + " (" + persona.getCedula() + ")");
+                        registros.append("Persona: ")
+                            .append(persona.getNombre())
+                            .append(" (")
+                            .append(persona.getCedula())
+                            .append(")\n");
                         for (Accidente accidente : accidentes) {
                             if (accidente.getPersona() == persona) {
-                                System.out.println("  Accidente: " + accidente.getDescripcion() + ", fecha="
-                                        + accidente.getFechaAccidente());
+                                registros.append("  Accidente: ")
+                                    .append(accidente.getDescripcion())
+                                    .append(", fecha=")
+                                    .append(accidente.getFechaAccidente())
+                                    .append("\n");
                             }
                         }
                     }
+                    salida.mostrarMensaje(registros.toString(), "Registros de accidentes");
                     break;
                 case 2:
-                    System.out.println("Porcentaje de conductores menores de 25 años: " + (getPerMenores()) + "%");
+                    salida.mostrarMensaje(
+                        "Porcentaje de conductores menores de 25 anos: " + (getPerMenores()) + "%",
+                        "Resultado"
+                    );
                     break;
                 case 3:
-                    System.out.println("Porcentaje de conductores del sexo femenino: " + (getPerFemenino()) + "%");
+                    salida.mostrarMensaje(
+                        "Porcentaje de conductores del sexo femenino: " + (getPerFemenino()) + "%",
+                        "Resultado"
+                    );
                     break;
                 case 4:
-                    System.out.println("Porcentaje de conductores masculinos con edades entre 12 y 30 años: "
-                        + (getPerRango()) + "%");
+                    salida.mostrarMensaje(
+                        "Porcentaje de conductores masculinos con edades entre 12 y 30 anos: "
+                            + (getPerRango()) + "%",
+                        "Resultado"
+                    );
                     break;
                 case 5:
-                    System.out.println("Porcentaje de conductores cuyos carros estan registrados fuera de Medellin: "
-                        + (getPerFuera()) + "%");
+                    salida.mostrarMensaje(
+                        "Porcentaje de conductores cuyos carros estan registrados fuera de Medellin: "
+                            + (getPerFuera()) + "%",
+                        "Resultado"
+                    );
                     break;
                 case 6:
-                    System.out.println("Ingrese el nombre de la persona: ");
-                    String nombre = sc.next();
-                    System.out.println("Ingrese la cedula de la persona: ");
-                    int cedula = sc.nextInt();
-                    System.out.println("Ingrese la fecha de nacimiento de la persona (YYYY-MM-DD): ");
-                    Date fechaNac = Date.valueOf(sc.next());
-                    System.out.println("Ingrese el sexo de la persona (0 para masculino, 1 para femenino): ");
-                    int sexo = sc.nextInt();
-                    System.out.println("Ingrese el registro del carro de la persona: ");
-                    int registroCarro = sc.nextInt();
+                    String nombre = leerTextoNoVacio(entrada, salida, "Ingrese el nombre de la persona:");
+                    if (nombre == null) {
+                        salida.mostrarMensaje("Operacion cancelada", "Registro");
+                        break;
+                    }
+                    Integer cedula = leerEntero(entrada, salida, "Ingrese la cedula de la persona:");
+                    if (cedula == null) {
+                        salida.mostrarMensaje("Operacion cancelada", "Registro");
+                        break;
+                    }
+                    Date fechaNac = leerFecha(
+                        entrada,
+                        salida,
+                        "Ingrese la fecha de nacimiento de la persona (YYYY-MM-DD):"
+                    );
+                    if (fechaNac == null) {
+                        salida.mostrarMensaje("Operacion cancelada", "Registro");
+                        break;
+                    }
+                    Integer sexo = leerEntero(entrada, salida, "Ingrese el sexo de la persona (0 masculino, 1 femenino):");
+                    if (sexo == null) {
+                        salida.mostrarMensaje("Operacion cancelada", "Registro");
+                        break;
+                    }
+                    Integer registroCarro = leerEntero(entrada, salida, "Ingrese el registro del carro de la persona:");
+                    if (registroCarro == null) {
+                        salida.mostrarMensaje("Operacion cancelada", "Registro");
+                        break;
+                    }
                     Persona nuevaPersona = new Persona(nombre, cedula, fechaNac, sexo, registroCarro);
                     personas.add(nuevaPersona);
-                    System.out.println("Ingrese la descripcion del accidente: ");
-                    String descripcion = sc.next();
+                    String descripcion = leerTextoNoVacio(entrada, salida, "Ingrese la descripcion del accidente:");
+                    if (descripcion == null) {
+                        salida.mostrarMensaje("Operacion cancelada", "Registro");
+                        break;
+                    }
                     Accidente nuevoAccidente = new Accidente(nuevaPersona, new Date(System.currentTimeMillis()),
                             descripcion);
                     accidentes.add(nuevoAccidente);
-                    System.out.println("Accidente registrado exitosamente para " + nuevaPersona.getNombre());
+                    salida.mostrarMensaje(
+                        "Accidente registrado exitosamente para " + nuevaPersona.getNombre(),
+                        "Registro"
+                    );
                     break;
                 case 7:
-                    System.out.println("Gracias por usar el sistema de la oficina de seguros");
-                    condition = false;
+                    salida.mostrarMensaje(
+                        "Gracias por usar el sistema de la oficina de seguros",
+                        "Salida"
+                    );
+                    continuar = false;
                     break;
                 default:
                     break;
             }
-            if (opcion == 7) {
-                condition = false;
-            } else {
-                System.out.print(
-                        "1) Ver registros de accidentes\n2) Ver el porcentaje de conductores menores de 25 años\n3) Ver el porcentaje de conductores del sexo femenino\n4) Ver el porcentaje de conductores masculinos con edades entre 12 y 30 años\n5) Ver el porcentaje de conductores cuyos carros estan registrados fuera de Medellin\n6) Registrar nuevo accidente\n7) Salir\nOpcion: ");
-                condition = true;
-                while (condition) {
-                    try {
-                        opcion = sc.nextInt();
-                        condition = false;
-                    } catch (Exception e) {
-                        System.out.println("Ingrese una opcion valida");
-                    }
-                }
-                condition = true;
+        }
+    }
+
+    private static Integer leerEntero(Entrada entrada, Salida salida, String mensaje) {
+        while (true) {
+            String texto = entrada.recibirInformacion(mensaje);
+            if (texto == null) {
+                return null;
+            }
+            if (texto.trim().isEmpty()) {
+                salida.mostrarMensaje("Entrada vacia", "Error");
+                continue;
+            }
+            try {
+                return Integer.parseInt(texto.trim());
+            } catch (NumberFormatException e) {
+                salida.mostrarMensaje("Ingrese un numero valido", "Error");
+            }
+        }
+    }
+
+    private static String leerTextoNoVacio(Entrada entrada, Salida salida, String mensaje) {
+        while (true) {
+            String texto = entrada.recibirInformacion(mensaje);
+            if (texto == null) {
+                return null;
+            }
+            if (texto.trim().isEmpty()) {
+                salida.mostrarMensaje("Entrada vacia", "Error");
+                continue;
+            }
+            return texto.trim();
+        }
+    }
+
+    private static Date leerFecha(Entrada entrada, Salida salida, String mensaje) {
+        while (true) {
+            String texto = entrada.recibirInformacion(mensaje);
+            if (texto == null) {
+                return null;
+            }
+            if (texto.trim().isEmpty()) {
+                salida.mostrarMensaje("Entrada vacia", "Error");
+                continue;
+            }
+            try {
+                return Date.valueOf(texto.trim());
+            } catch (IllegalArgumentException e) {
+                salida.mostrarMensaje("Formato de fecha invalido (YYYY-MM-DD)", "Error");
             }
         }
     }
