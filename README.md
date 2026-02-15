@@ -1,1 +1,2 @@
-# EjercicioSeguros
+# TALLER CONSTRUCCION DE SOFTWARE
+# En este espacio se van a adjuntar todos los codigos correspondientes al taller, cada uno de ellos esta mejor descrito en el reporte de la solucion asi como con sus respectivos diagramas.
