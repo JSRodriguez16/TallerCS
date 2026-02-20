@@ -166,7 +166,6 @@ public class Main {
             return;
         }
 
-        // Verificar si el ID ya existe
         for (Pedido p : pedidos) {
             if (p.getId() == id) {
                 salida.mostrarMensaje("Ya existe un pedido con ese ID", "Error");

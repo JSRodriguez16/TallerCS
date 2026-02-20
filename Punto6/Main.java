@@ -62,25 +62,31 @@ public class Main {
                 if (pedro.getVotos() >= maria.getVotos()) {
                     salida.mostrarMensaje("No hay ganador en primera vuelta.\nSegunda vuelta: Juan y Pedro",
                             "Resultado de la eleccion");
+                    simularSegundaVuelta(entrada, salida, "Juan", "Pedro");
                 } else {
                     salida.mostrarMensaje("No hay ganador en primera vuelta.\nSegunda vuelta: Juan y Maria",
                             "Resultado de la eleccion");
+                    simularSegundaVuelta(entrada, salida, "Juan", "Maria");
                 }
             } else if (pedro.getVotos() >= juan.getVotos() && pedro.getVotos() >= maria.getVotos()) {
                 if (juan.getVotos() >= maria.getVotos()) {
                     salida.mostrarMensaje("No hay ganador en primera vuelta.\nSegunda vuelta: Pedro y Juan",
                             "Resultado de la eleccion");
+                    simularSegundaVuelta(entrada, salida, "Pedro", "Juan");
                 } else {
                     salida.mostrarMensaje("No hay ganador en primera vuelta.\nSegunda vuelta: Pedro y Maria",
                             "Resultado de la eleccion");
+                    simularSegundaVuelta(entrada, salida, "Pedro", "Maria");
                 }
             } else {
                 if (juan.getVotos() >= pedro.getVotos()) {
                     salida.mostrarMensaje("No hay ganador en primera vuelta.\nSegunda vuelta: Maria y Juan",
                             "Resultado de la eleccion");
+                    simularSegundaVuelta(entrada, salida, "Maria", "Juan");
                 } else {
                     salida.mostrarMensaje("No hay ganador en primera vuelta.\nSegunda vuelta: Maria y Pedro",
                             "Resultado de la eleccion");
+                    simularSegundaVuelta(entrada, salida, "Maria", "Pedro");
                 }
             }
         } catch (NumberFormatException ex) {
@@ -98,5 +104,35 @@ public class Main {
         }
 
         return Integer.parseInt(valor.trim());
+    }
+
+    private static void simularSegundaVuelta(Entrada entrada, Salida salida, String candidato1, String candidato2) {
+        Integer votosCandidato1 = solicitarVotos(entrada, salida, candidato1 + " (segunda vuelta)");
+        if (votosCandidato1 == null) {
+            return;
+        }
+
+        Integer votosCandidato2 = solicitarVotos(entrada, salida, candidato2 + " (segunda vuelta)");
+        if (votosCandidato2 == null) {
+            return;
+        }
+
+        if (votosCandidato1 < 0 || votosCandidato2 < 0) {
+            salida.mostrarMensaje("Los votos no pueden ser negativos.", "Resultado segunda vuelta");
+            return;
+        }
+
+        if (votosCandidato1 == 0 && votosCandidato2 == 0) {
+            salida.mostrarMensaje("No hay votos registrados en segunda vuelta.", "Resultado segunda vuelta");
+            return;
+        }
+
+        if (votosCandidato1 > votosCandidato2) {
+            salida.mostrarMensaje("Gana en segunda vuelta: " + candidato1, "Resultado segunda vuelta");
+        } else if (votosCandidato2 > votosCandidato1) {
+            salida.mostrarMensaje("Gana en segunda vuelta: " + candidato2, "Resultado segunda vuelta");
+        } else {
+            salida.mostrarMensaje("Segunda vuelta empatada. La eleccion debe repetirse.", "Resultado segunda vuelta");
+        }
     }
 }
